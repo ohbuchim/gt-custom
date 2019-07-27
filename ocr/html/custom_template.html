@@ -1,0 +1,105 @@
+
+<script src="https://assets.crowd.aws/crowd-html-elements.js"></script>
+
+<style>
+body {
+  padding: 0;
+  margin: 0;
+  font-family: Arial,Meiryo;
+  text-align: right;
+}
+
+div {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+#headerblock {
+  height: 50px;
+  width: 100%;
+  background-color: #dddddd;
+  text-align: center;
+  padding: 1% 0% 0% 1%;
+}
+
+#wrapper {
+  border: 10px solid gray;
+  display: flex;
+  height: calc( 100vh - 300px);
+  width: 100%;
+}
+
+#wrapper #instructionArea {
+  border: 10px;
+  height: 100%;
+  width: 300px;
+  text-align: left;
+  padding: 0% 1% 0% 1%;
+}
+
+#wrapper #imageArea {
+  border: 1px 0px 1px 0px solid black;
+  height: 100%;
+  width: calc(100vw - 600px);
+  text-align: center
+}
+
+#wrapper #inputArea {
+  border: 10px;
+  height: 100%;
+  width: 400px;
+  text-align: left;
+  padding: 0px 2% 0px 2%;
+}
+
+#wrapper #checkbox {
+  text-align: left;
+  padding: 20px 2% 100px 2%;
+}
+
+#footerblock {
+  height: 10px;
+  width: 100%;
+  background-color: #dddddd;
+}
+</style>
+
+<crowd-form>
+  <div id="headerblock">Image Annotation Sample</div>
+  <div id="wrapper">
+    <div id="instructionArea">
+      <p>Enter the nummbers or alphabets [0-9, a-z, A-Z, -] written on the image in the text box in the order they appear on the image. Examples are shown in the following link.</p>
+      <crowd-instructions link-text="Click for detailed instructions" link-type="link">
+        <detailed-instructions>aaa</detailed-instructions>
+        <negative-example>bbb</negative-example>
+        <positive-example>ccc</positive-example>
+        <short-summary>eee</short-summary>
+      </crowd-instructions>
+      
+    </div>
+    <div id="imageArea">
+      <p>
+        <crowd-card image="{{ task.input.taskObject | grant_read_access }}"</crowd-card>
+      </p>
+    </div>
+    <div id="inputArea">
+      <crowd-text-area
+        name="userinput"
+        label="input here"
+        max-rows = 1
+        auto-focus = True
+      >
+      </crowd-text-area>
+      <div  id="checkbox">
+        <crowd-checkbox name="cannotRead">I cannot read anything from the image.</crowd-checkbox>
+      </div>
+      <div>
+        <crowd-button form-action="submit" variant="primary">Submit</crowd-button>
+      </div>
+    </div>
+  </div>
+  <div id="footerblock">
+  </div>
+</crowd-form>
