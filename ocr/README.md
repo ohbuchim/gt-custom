@@ -5,3 +5,8 @@
 
  - アノテーション画面を作るためのhtmlファイル（カスタムテンプレート）
  - 前処理と後処理用のLambda関数（python）
+
+## アノテーション結果保存場所
+S3の以下の場所にアノテーション結果のmanifestファイルが保存される。
+
+出力データセットの場所/manifests/output/output.manifest
