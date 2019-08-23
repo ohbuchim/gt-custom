@@ -1,31 +1,45 @@
 # -*- coding: utf-8 -*-
 import json
+from urllib.parse import urlparse
+
+import boto3
 
 
 def lambda_handler(event, context):
+    """Post labeling lambda function for custom labeling jobs"""
 
     # Event received
     print("Received event: " + json.dumps(event, indent=2))
 
-    # Get source if specified
-    source = event['dataObject']['source'] if "source" in event['dataObject'] else None
+    consolidated_labels = []
 
-    # Get source-ref if specified
-    source_ref = event['dataObject']['source-ref'] if "source-ref" in event['dataObject'] else None
+    parsed_url = urlparse(event['payload']['s3Uri'])
 
-    # if source field present, take that otherwise take source-ref
-    task_object = source if source is not None else source_ref
+    s3 = boto3.client('s3')
+    textFile = s3.get_object(Bucket=parsed_url.netloc, Key=parsed_url.path[1:])
+    print(textFile)
+    filecont = textFile['Body'].read()
+    annotations = json.loads(filecont)
 
-    # Build response object
-    output = {
-        "taskInput": {
-            "taskObject": task_object}}
+    for dataset in annotations:
+        for annotation in dataset['annotations']:
+            new_annotation = json.loads(
+                annotation['annotationData']['content'])
+            label = {
+                'datasetObjectId': dataset['datasetObjectId'],
+                'consolidatedAnnotation': {
+                    'content': {
+                        event['labelAttributeName']: {
+                            'workerId': annotation['workerId'],
+                            'result': new_annotation,
+                            'labeledContent': dataset['dataObject']
+                        }
+                    }
+                }
+            }
+            consolidated_labels.append(label)
 
     # Response sending
-    print("Response: " + json.dumps(output))
+    print("Response: " + json.dumps(consolidated_labels))
 
-    # If neither source nor source-ref specified, mark the annotation failed
-    if task_object is None:
-        print(" Failed to pre-process {} !".format(event["labelingJobArn"]))
-
-    return output
+    return consolidated_labels
